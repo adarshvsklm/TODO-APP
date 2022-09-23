@@ -6,7 +6,7 @@ const router = express.Router()
 router.post('/add',add)
 router.get('/list',list)
 router.patch('/edit',edit)
-router.delete('/delete:id',deleteItem)
+router.delete('/delete',deleteItem)
 
 
 export default router

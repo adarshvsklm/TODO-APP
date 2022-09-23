@@ -34,11 +34,14 @@ export const edit = (req, res) => {
 };
 
 export const deleteItem = (req, res) => {
-    ToDoList.deleteOne({_id:req.params.id})
+    console.log(34353);
+    ToDoList.deleteOne({_id:req.query.id})
     .then((response)=>{
+        console.log(response);
         res.status(200).json(response)
     })
     .catch((err)=>{
+        console.log(err);
         res.json(err)
     })
 }

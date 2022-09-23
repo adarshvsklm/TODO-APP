@@ -88,8 +88,9 @@ export default function List() {
       sortable: false,
       renderCell: (params) => {
         const handleDelete = async (e) => {
+            e.stopPropagation();
           axios
-            .delete(`${serverUrl}/${params.row._id}`)
+            .delete(`${serverUrl}/delete?id=${params.row._id}`)
             .then((res) => {
               setChanged(!change);
             })
