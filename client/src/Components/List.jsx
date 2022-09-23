@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import { Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-
+import Box from '@mui/material/Box';
 import { useState } from 'react';
 import { serverUrl } from '../serverUrl';
 import TextField from '@mui/material/TextField';
@@ -15,11 +15,9 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
 export default function List() {
-
-    const [open, setOpen] = React.useState(false);
-    const [item,setItem] =useState({})
-    const [change, setChanged] = useState(true);
-
+  const [open, setOpen] = React.useState(false);
+  const [item, setItem] = useState({});
+  const [change, setChanged] = useState(true);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -28,30 +26,32 @@ export default function List() {
   const handleClose = () => {
     setOpen(false);
   };
-const editItem =()=>{
- axios.patch(`${serverUrl}/edit`,item)
- .then((res)=>{
-    console.log(res);
-    setChanged(!change)
-    setOpen(false)
+  const editItem = () => {
+    axios
+      .patch(`${serverUrl}/edit`, item)
+      .then((res) => {
+        console.log(res);
+        setChanged(!change);
+        setOpen(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
+  const [listInput, setListInput] = useState();
+  const handleSubmit = () => {
+    axios
+      .post(`${serverUrl}/add`, { listItem: listInput })
+      .then((res) => {
+        setChanged(!change);
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
- })
- .catch((err)=>{
-    console.log(err);
- })
-}
-
-// const handleDelete =()=>{
-//     axios.delete(`${serverUrl}?id=${item.id}`)
-//     .then((res)=>{
-//         setChanged(!change)
-//     })
-//     .catch((err)=>{
-//         console.log(err);
-//     })
-// }
-  
   const columns = [
     { field: 'listItem', headerName: 'item', width: 230 },
 
@@ -62,10 +62,9 @@ const editItem =()=>{
       sortable: false,
       renderCell: (params) => {
         const handleEdit = async (e) => {
-            setItem({id:params.row._id,listItem:params.row.listItem})
-            setOpen(true);
+          setItem({ id: params.row._id, listItem: params.row.listItem });
+          setOpen(true);
           e.stopPropagation(); // don't select this row after clicking
-          
         };
 
         return (
@@ -78,37 +77,34 @@ const editItem =()=>{
             >
               Edit
             </Button>
-            {/* <CloseIcon onClick={handleDelete}/> */}
           </div>
         );
       },
     },
     {
-        field: 'Delete',
-        width: 330,
-        headerName: 'Delete',
-        sortable: false,
-        renderCell: (params) => {
-          const handleDelete = async (e) => {
+      field: 'Delete',
+      width: 330,
+      headerName: 'Delete',
+      sortable: false,
+      renderCell: (params) => {
+        const handleDelete = async (e) => {
+          axios
+            .delete(`${serverUrl}/${params.row._id}`)
+            .then((res) => {
+              setChanged(!change);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        };
 
-            axios.delete(`${serverUrl}/${params.row._id}`)
-            .then((res)=>{
-                setChanged(!change)
-            })
-            .catch((err)=>{
-                console.log(err);
-            })
-            
-          };
-  
-          return (
-            <div>
-              
-              <CloseIcon onClick={handleDelete}/>
-            </div>
-          );
-        },
+        return (
+          <div>
+            <CloseIcon onClick={handleDelete} />
+          </div>
+        );
       },
+    },
   ];
 
   const [list, setList] = React.useState();
@@ -127,7 +123,6 @@ const editItem =()=>{
     fetchData();
   }, [change]);
 
-  console.log(list);
   return (
     <div
       style={{
@@ -137,6 +132,33 @@ const editItem =()=>{
         justifyContent: 'space-between',
       }}
     >
+      <div>
+        <Box
+          component='form'
+          sx={{
+            '& > :not(style)': { m: 1, width: '25ch' },
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+          }}
+          noValidate
+          autoComplete='off'
+        >
+          <h2>Add To List</h2>
+          <TextField
+            id='outlined-basic'
+            label='Enter '
+            variant='outlined'
+            onChange={(e) => {
+              setListInput(e.target.value);
+            }}
+          />
+          <Button variant='contained' onClick={handleSubmit}>
+            Add
+          </Button>
+        </Box>
+      </div>
       {list && (
         <DataGrid
           rows={list}
@@ -147,21 +169,21 @@ const editItem =()=>{
           checkboxSelection
         />
       )}
-      //////
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Edit</DialogTitle>
         <DialogContent>
-          
           <TextField
-          value={item.listItem}
+            value={item.listItem}
             autoFocus
-            margin="dense"
-            id="name"
-            label="List Item"
-            type="email"
-            fullWidth 
-            variant="standard"
-            onChange={(e)=>{setItem({...item,listItem:e.target.value})}}
+            margin='dense'
+            id='name'
+            label='List Item'
+            type='email'
+            fullWidth
+            variant='standard'
+            onChange={(e) => {
+              setItem({ ...item, listItem: e.target.value });
+            }}
           />
         </DialogContent>
         <DialogActions>
@@ -169,7 +191,6 @@ const editItem =()=>{
           <Button onClick={editItem}>Update</Button>
         </DialogActions>
       </Dialog>
-
     </div>
   );
 }

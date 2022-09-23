@@ -35,4 +35,10 @@ export const edit = (req, res) => {
 
 export const deleteItem = (req, res) => {
     ToDoList.deleteOne({_id:req.params.id})
+    .then((response)=>{
+        res.status(200).json(response)
+    })
+    .catch((err)=>{
+        res.json(err)
+    })
 }
